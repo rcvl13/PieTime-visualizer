@@ -6,17 +6,18 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 const PieChartComponent = ({ activities, categories }) => {
   const totalTime = activities.reduce((sum, a) => sum + a.timeSpent, 0);
 
-  const dataByCategory = activities.reduce((acc, activity) => {
-    acc[activity.category] = (acc[activity.category] || 0) + activity.timeSpent;
-    return acc;
-  }, {});
+  const labels = activities.map((activity) => activity.name);
+  const dataPoints = activities.map((activity) => activity.timeSpent);
+  const backgroundColors = activities.map(
+    (activity) => categories[activity.category] || "#ccc"
+  );
 
   const data = {
-    labels: Object.keys(dataByCategory),
+    labels,
     datasets: [
       {
-        data: Object.values(dataByCategory),
-        backgroundColor: Object.keys(dataByCategory).map((cat) => categories[cat] || "#ccc"),
+        data: dataPoints,
+        backgroundColor: backgroundColors,
         borderWidth: 1,
       },
     ],
