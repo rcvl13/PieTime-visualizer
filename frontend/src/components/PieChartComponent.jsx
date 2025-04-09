@@ -4,23 +4,47 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const PieChartComponent = ({ activities, categories }) => {
-  const totalTime = activities.reduce((sum, a) => sum + a.timeSpent, 0);
+  const totalTime = activities.reduce((sum, activity) => sum + activity.timeSpent, 0);
 
-  const labels = activities.map((activity) => activity.name);
+  // Each activity name becomes a label
+  const labels = activities.map((activity, index) => `${activity.name} (${activity.timeSpent} mins)`);
+
+  // Pie data points
   const dataPoints = activities.map((activity) => activity.timeSpent);
+
+  // Match background color with its category
   const backgroundColors = activities.map(
-    (activity) => categories[activity.category] || "#ccc"
+    (activity) => categories[activity.category] || "#cccccc"
   );
 
   const data = {
-    labels,
+    labels: labels,
     datasets: [
       {
+        label: "Time Spent (mins)",
         data: dataPoints,
         backgroundColor: backgroundColors,
         borderWidth: 1,
       },
     ],
+  };
+
+  const options = {
+    plugins: {
+      tooltip: {
+        callbacks: {
+          label: function (context) {
+            const label = context.label || "";
+            const value = context.formattedValue || "";
+            return `${label}: ${value} mins`;
+          },
+        },
+      },
+      legend: {
+        display: true,
+        position: "top",
+      },
+    },
   };
 
   return (
@@ -29,8 +53,8 @@ const PieChartComponent = ({ activities, categories }) => {
         <p>No activity data to display.</p>
       ) : (
         <>
-          <h3>Total Time: {totalTime} mins</h3>
-          <Pie data={data} />
+          <h3><strong>Total Time:</strong> {totalTime} mins</h3>
+          <Pie data={data} options={options} />
         </>
       )}
     </div>
