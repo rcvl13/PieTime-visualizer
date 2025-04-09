@@ -1,70 +1,39 @@
-import { useState } from "react";
+import { Pie } from "react-chartjs-2";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
-const ActivityForm = ({ onActivityAdded }) => {
-  const [activity, setActivity] = useState({
-    name: "",
-    category: "",
-    timeSpent: "",
-  });
+ChartJS.register(ArcElement, Tooltip, Legend);
 
-  const handleChange = (e) => {
-    setActivity({ ...activity, [e.target.name]: e.target.value });
-  };
+const PieChartComponent = ({ activities, categories }) => {
+  const totalTime = activities.reduce((sum, a) => sum + a.timeSpent, 0);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch("https://pietime-visualizer.onrender.com/add-activity", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(activity),
-      });
+  const dataByCategory = activities.reduce((acc, activity) => {
+    acc[activity.category] = (acc[activity.category] || 0) + activity.timeSpent;
+    return acc;
+  }, {});
 
-      if (response.ok) {
-        alert("Activity added successfully!");
-        setActivity({ name: "", category: "", timeSpent: "" });
-        onActivityAdded(); // Refresh the chart
-      } else {
-        alert("Failed to add activity.");
-      }
-    } catch (error) {
-      console.error("Error adding activity:", error);
-      alert("Server error. Please try again later.");
-    }
+  const data = {
+    labels: Object.keys(dataByCategory),
+    datasets: [
+      {
+        data: Object.values(dataByCategory),
+        backgroundColor: Object.keys(dataByCategory).map((cat) => categories[cat] || "#ccc"),
+        borderWidth: 1,
+      },
+    ],
   };
 
   return (
-    <div>
-      <h2>Add Activity</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="name"
-          placeholder="Activity Name"
-          value={activity.name}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="text"
-          name="category"
-          placeholder="Category"
-          value={activity.category}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="number"
-          name="timeSpent"
-          placeholder="Time Spent (minutes)"
-          value={activity.timeSpent}
-          onChange={handleChange}
-          required
-        />
-        <button type="submit">Submit</button>
-      </form>
+    <div style={{ maxWidth: "500px", margin: "0 auto" }}>
+      {activities.length === 0 ? (
+        <p>No activity data to display.</p>
+      ) : (
+        <>
+          <h3>Total Time: {totalTime} mins</h3>
+          <Pie data={data} />
+        </>
+      )}
     </div>
   );
 };
 
-export default ActivityForm;
+export default PieChartComponent;

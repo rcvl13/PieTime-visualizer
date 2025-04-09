@@ -3,7 +3,7 @@ import { useState } from "react";
 const ActivityForm = ({ onActivityAdded }) => {
   const [activity, setActivity] = useState({
     name: "",
-    category: "",
+    category: "Productivity", // default category
     timeSpent: "",
   });
 
@@ -14,19 +14,25 @@ const ActivityForm = ({ onActivityAdded }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("https://pietime-visualizer.onrender.com/add-activity", {
+      const response = await fetch("http://localhost:5000/add-activity", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(activity),
+        body: JSON.stringify({
+          ...activity,
+          timeSpent: Number(activity.timeSpent),
+        }),
       });
 
       if (response.ok) {
         alert("Activity added successfully!");
-        setActivity({ name: "", category: "", timeSpent: "" });
+        setActivity({ name: "", category: "Productivity", timeSpent: "" });
         onActivityAdded(); // Refresh the chart
+      } else {
+        alert("Failed to add activity.");
       }
     } catch (error) {
       console.error("Error adding activity:", error);
+      alert("Server error. Please try again later.");
     }
   };
 
@@ -42,14 +48,15 @@ const ActivityForm = ({ onActivityAdded }) => {
           onChange={handleChange}
           required
         />
-        <input
-          type="text"
-          name="category"
-          placeholder="Category"
-          value={activity.category}
-          onChange={handleChange}
-          required
-        />
+
+        <select name="category" value={activity.category} onChange={handleChange} required>
+          <option value="Productivity">Productivity</option>
+          <option value="Exercise">Exercise</option>
+          <option value="Freetime">Freetime</option>
+          <option value="Study">Study</option>
+          <option value="Sleep">Sleep</option>
+        </select>
+
         <input
           type="number"
           name="timeSpent"
