@@ -1,50 +1,70 @@
-import React from "react";
-import { Pie } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  ArcElement,
-  Tooltip,
-  Legend
-} from "chart.js";
+import { useState } from "react";
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+const ActivityForm = ({ onActivityAdded }) => {
+  const [activity, setActivity] = useState({
+    name: "",
+    category: "",
+    timeSpent: "",
+  });
 
-const PieChartComponent = ({ activities, categories }) => {
-  const chartData = {
-    labels: activities.map((a) => a.name),
-    datasets: [
-      {
-        data: activities.map((a) => a.timeSpent),
-        backgroundColor: activities.map(
-          (a) => categories[a.category] || "#999999"
-        ),
-        borderWidth: 1
-      }
-    ]
+  const handleChange = (e) => {
+    setActivity({ ...activity, [e.target.name]: e.target.value });
   };
 
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: "top"
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch("https://pietime-visualizer.onrender.com/add-activity", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(activity),
+      });
+
+      if (response.ok) {
+        alert("Activity added successfully!");
+        setActivity({ name: "", category: "", timeSpent: "" });
+        onActivityAdded(); // Refresh the chart
+      } else {
+        alert("Failed to add activity.");
       }
+    } catch (error) {
+      console.error("Error adding activity:", error);
+      alert("Server error. Please try again later.");
     }
   };
 
   return (
-    <div className="chart-wrapper">
-      <h2 className="chart-title">Activity Pie Chart</h2>
-      <div className="responsive-chart">
-        {activities.length > 0 ? (
-          <Pie data={chartData} options={chartOptions} />
-        ) : (
-          <p style={{ textAlign: "center" }}>No activities yet.</p>
-        )}
-      </div>
+    <div>
+      <h2>Add Activity</h2>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          name="name"
+          placeholder="Activity Name"
+          value={activity.name}
+          onChange={handleChange}
+          required
+        />
+        <input
+          type="text"
+          name="category"
+          placeholder="Category"
+          value={activity.category}
+          onChange={handleChange}
+          required
+        />
+        <input
+          type="number"
+          name="timeSpent"
+          placeholder="Time Spent (minutes)"
+          value={activity.timeSpent}
+          onChange={handleChange}
+          required
+        />
+        <button type="submit">Submit</button>
+      </form>
     </div>
   );
 };
 
-export default PieChartComponent;
+export default ActivityForm;

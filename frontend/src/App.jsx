@@ -18,7 +18,7 @@ const App = () => {
 
   const fetchActivities = async () => {
     try {
-      const res = await fetch("http://localhost:5000/activities");
+      const res = await fetch("https://pietime-visualizer.onrender.com/activities");
       const data = await res.json();
       setActivities(data);
     } catch (error) {
@@ -40,7 +40,7 @@ const App = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:5000/add-activity", {
+      const response = await fetch("https://pietime-visualizer.onrender.com/add-activity", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newActivity),
@@ -56,10 +56,9 @@ const App = () => {
     }
   };
 
-  // ✅ Reset Handler
   const handleReset = async () => {
     try {
-      await fetch("http://localhost:5000/reset-activities", {
+      await fetch("https://pietime-visualizer.onrender.com/reset-activities", {
         method: "DELETE",
       });
       setActivities([]); // clear UI chart
@@ -100,9 +99,9 @@ const App = () => {
         <button type="submit">Add Activity</button>
       </form>
 
-      {/* ✅ Reset Button */}
       <div style={{ textAlign: "center", marginBottom: "30px" }}>
-        <button className="reset-button"
+        <button
+          className="reset-button"
           onClick={handleReset}
           style={{ backgroundColor: "red", color: "white" }}
         >
@@ -116,4 +115,3 @@ const App = () => {
 };
 
 export default App;
-  
