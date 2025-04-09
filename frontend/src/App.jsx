@@ -16,7 +16,7 @@ const App = () => {
 
   const fetchActivities = async () => {
     try {
-      const res = await fetch("http://localhost:5000/activities");
+      const res = await fetch("https://pietime-visualizer.onrender.com/activities");
       const data = await res.json();
       setActivities(data);
     } catch (error) {
@@ -30,7 +30,7 @@ const App = () => {
 
   const handleReset = async () => {
     try {
-      await fetch("http://localhost:5000/reset-activities", {
+      await fetch("https://pietime-visualizer.onrender.com/reset-activities", {
         method: "DELETE",
       });
       setActivities([]);

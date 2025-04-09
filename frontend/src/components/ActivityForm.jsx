@@ -3,7 +3,7 @@ import { useState } from "react";
 const ActivityForm = ({ onActivityAdded }) => {
   const [activity, setActivity] = useState({
     name: "",
-    category: "Productivity", // default category
+    category: "Productivity",
     timeSpent: "",
   });
 
@@ -14,7 +14,7 @@ const ActivityForm = ({ onActivityAdded }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:5000/add-activity", {
+      const response = await fetch("https://pietime-visualizer.onrender.com/add-activity", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -26,7 +26,7 @@ const ActivityForm = ({ onActivityAdded }) => {
       if (response.ok) {
         alert("Activity added successfully!");
         setActivity({ name: "", category: "Productivity", timeSpent: "" });
-        onActivityAdded(); // Refresh the chart
+        onActivityAdded();
       } else {
         alert("Failed to add activity.");
       }
